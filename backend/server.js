@@ -41,6 +41,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage })
 
 /* app.use("/api/v1/restaurants", restaurants) */
-app.use("*", (req,res) => res.status(404).json({error: "not found"}))
+/* app.use("*", (req,res) => res.status(404).json({error: "not found"})) */
 
 export default app

@@ -6,6 +6,7 @@ import morgan from "morgan"
 import path from "path"
 import { fileURLToPath } from "url"
 import multer from "multer"
+import { register } from "./controllers/auth.js"
 /* import restaurants from "./api/restaurants.route.js" */
 
 const __filename= fileURLToPath(import.meta.url)
@@ -39,6 +40,9 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage })
+
+/* Routes with files */
+app.post("/auth/register", upload.single("picture"), register)
 
 /* app.use("/api/v1/restaurants", restaurants) */
 /* app.use("*", (req,res) => res.status(404).json({error: "not found"})) */

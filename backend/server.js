@@ -5,6 +5,7 @@ import bodyParser from "body-parser"
 import morgan from "morgan"
 import path from "path"
 import { fileURLToPath } from "url"
+import authRoutes from "./routes.auth.js"
 import multer from "multer"
 import { register } from "./controllers/auth.js"
 /* import restaurants from "./api/restaurants.route.js" */
@@ -44,7 +45,5 @@ const upload = multer({ storage })
 /* Routes with files */
 app.post("/auth/register", upload.single("picture"), register)
 
-/* app.use("/api/v1/restaurants", restaurants) */
-/* app.use("*", (req,res) => res.status(404).json({error: "not found"})) */
 
 export default app

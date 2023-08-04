@@ -8,7 +8,7 @@ import { fileURLToPath } from "url"
 import authRoutes from "./routes.auth.js"
 import multer from "multer"
 import { register } from "./controllers/auth.js"
-import supplierRoutes from "./routes/suppliers.js"
+import supplierRoutes from "./routes/supplierRoutes.js"
 
 
 const __filename= fileURLToPath(import.meta.url)

@@ -4,7 +4,7 @@ import {
     createNewSupplier,
     updateSupplier,
     deleteSupplier
-} from "../controllers/suppliers.js"
+} from "../controllers/supplierController.js"
 import { verifyToken } from "../middleware/auth.js"
 
 const router = express.Router()

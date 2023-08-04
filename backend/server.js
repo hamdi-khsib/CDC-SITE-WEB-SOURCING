@@ -9,7 +9,7 @@ import authRoutes from "./routes.auth.js"
 import multer from "multer"
 import { register } from "./controllers/auth.js"
 import supplierRoutes from "./routes/suppliers.js"
-/* import restaurants from "./api/restaurants.route.js" */
+
 
 const __filename= fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

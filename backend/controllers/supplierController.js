@@ -167,3 +167,10 @@ const deleteSupplier = asyncHandler (async (req,res) => {
 
     res.json(reply)
 })
+
+module.exports= {
+    getAllSuppliers,
+    createNewSupplier,
+    updateSupplier,
+    deleteSupplier
+}

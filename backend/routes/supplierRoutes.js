@@ -1,25 +1,20 @@
 import express from "express"
-import {
-    getAllSuppliers,
-    createNewSupplier,
-    updateSupplier,
-    deleteSupplier
-} from "../controllers/supplierController.js"
+import supplierController from "../controllers/supplierController.js"
 import { verifyToken } from "../middleware/auth.js"
 
 const router = express.Router()
 
 /* read */
-router.get("/", verifyToken, getAllSuppliers)
+router.get("/", verifyToken, supplierController.getAllSuppliers)
 
 /* create */
-router.post("/", createNewSupplier)
+router.post("/", supplierController.createNewSupplier)
 
 /* update */
-router.patch("/", updateSupplier)
+router.patch("/", supplierController.updateSupplier)
 
 /* delete */
-router.delete("/", deleteSupplier)
+router.delete("/", supplierController.deleteSupplier)
 
 
 export default router

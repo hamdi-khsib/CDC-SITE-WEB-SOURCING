@@ -8,6 +8,7 @@ import { fileURLToPath } from "url"
 import authRoutes from "./routes.auth.js"
 import multer from "multer"
 import { register } from "./controllers/auth.js"
+import supplierRoutes from "./routes/suppliers.js"
 /* import restaurants from "./api/restaurants.route.js" */
 
 const __filename= fileURLToPath(import.meta.url)
@@ -47,5 +48,6 @@ app.post("/auth/register", upload.single("picture"), register)
 
 /* Routes */
 app.use("/auth", authRoutes)
+app.use("/suppliers", supplierRoutes)
 
 export default app

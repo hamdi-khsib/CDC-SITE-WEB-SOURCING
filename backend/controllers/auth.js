@@ -56,7 +56,9 @@ export const login = async (req, res) => {
         if (!isMatch) return res.status(400).json({ message: "Invalid Credentials"})
 
         const token = jwt.sign({ id: supplier._id }, process.env.JWT_SECRET)
-        
+        delete supplier.password
+        es.status(400).json({ token, supplier })
+
         } catch(err) {
         res.status(500).json({ error: err.message})
     }

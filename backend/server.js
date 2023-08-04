@@ -9,6 +9,7 @@ import authRoutes from "./routes.auth.js"
 import multer from "multer"
 import { register } from "./controllers/auth.js"
 import supplierRoutes from "./routes/supplierRoutes.js"
+import buyerRoutes from "./routes/buyerRoutes.js"
 
 
 const __filename= fileURLToPath(import.meta.url)
@@ -49,5 +50,6 @@ app.post("/auth/register", upload.single("picture"), register)
 /* Routes */
 app.use("/auth", authRoutes)
 app.use("/suppliers", supplierRoutes)
+app.use("/buyers", buyerRoutes)
 
 export default app

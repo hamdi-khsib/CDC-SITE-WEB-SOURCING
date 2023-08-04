@@ -43,3 +43,21 @@ export const register = async (req, res) => {
         res.status(500).json({ error: err.message })
     }
 }
+
+/*  logging in */
+
+export const login = async (req, res) => {
+    try {
+        const { email, password } = req.body
+        const supplier = await Supplier.findOne({ email: email})
+        if (!supplier) return  res.status(400).json({ message: "Supplier does not exist"})
+
+        const isMatch = await bcrypt.compare(password, supplier.password)
+        if (!isMatch) return res.status(400).json({ message: "Invalid Credentials"})
+
+        const token = jwt.sign({ id: supplier._id }, process.env.JWT_SECRET)
+        
+        } catch(err) {
+        res.status(500).json({ error: err.message})
+    }
+}

@@ -20,8 +20,7 @@ const getAllSuppliers = asyncHandler (async (req,res) => {
 // @access Private
 const createNewSupplier = asyncHandler (async (req,res) => {
     const {
-        firstName,
-        lastName,
+        username,
         email,
         password,
         picturePath,
@@ -34,13 +33,13 @@ const createNewSupplier = asyncHandler (async (req,res) => {
     } = req.body
     
     // confirm data
-    if (!firstName || !lastName || !email || !address || !contact || !domain || !products || !prices || !password || !Array.isArray(userType) || !userType.length) {
+    if (!username || !email || !address || !contact || !domain || !products || !prices || !password || !Array.isArray(userType) || !userType.length) {
         return res.status(400).json({ message
             :'All fields are required' })
     }
 
     // check for duplicate 
-    const duplicate = await Supplier.findOne({ firstName }).lean().exec()
+    const duplicate = await Supplier.findOne({ username }).lean().exec()
     if (duplicate) {
         return res.status(400).json({ message:'Duplicate firstname' })
     }
@@ -50,8 +49,7 @@ const createNewSupplier = asyncHandler (async (req,res) => {
     const hashedPwd = await bcrypt.hash(password, 10) // salt rounds
 
     const supplierObject = {
-        firstName,
-        lastName,
+        username,
         email,
         password: hashedPwd,
         picturePath,
@@ -68,7 +66,7 @@ const createNewSupplier = asyncHandler (async (req,res) => {
     const supplier = await Supplier.create(supplierObject)
 
     if (supplier) {
-        res.status(201).json({ message: `New supplier ${firstName} created`})
+        res.status(201).json({ message: `New supplier ${username} created`})
     } else {
         res.status(400).json({ message: 'Invalid supplier data received'})
     } 
@@ -82,8 +80,7 @@ const createNewSupplier = asyncHandler (async (req,res) => {
 // @access Private
 const updateSupplier = asyncHandler (async (req,res) => {
     const {id,
-        firstName,
-        lastName,
+        username,
         email,
         password,
         picturePath,
@@ -96,7 +93,7 @@ const updateSupplier = asyncHandler (async (req,res) => {
     } = req.body
 
     // confirm data
-    if (!id || !firstName || !lastName || !email || !address || !contact || !domain || !products || !prices || !password || !Array.isArray(userType) || !userType.length) {
+    if (!id || !username || !email || !address || !contact || !domain || !products || !prices || !password || !Array.isArray(userType) || !userType.length) {
         return res.status(400).json({ message
             :'All fields are required' })
     }
@@ -108,14 +105,13 @@ const updateSupplier = asyncHandler (async (req,res) => {
     }
 
     // check for duplicate 
-    const duplicate = await Supplier.findOne({ firstName }).lean().exec()
+    const duplicate = await Supplier.findOne({ username }).lean().exec()
     //Allow updates to t
     if (duplicate && duplicate?._id.toString() !== id) {
-        return res.status(409).json({ message: 'Duplicate firstName'})
+        return res.status(409).json({ message: 'Duplicate username'})
     }
 
-    supplier.firstName = firstName
-    supplier.lastName = lastName
+    supplier.username = username
     supplier.email = email
     supplier.address = address
     supplier.contact = contact
@@ -131,7 +127,7 @@ const updateSupplier = asyncHandler (async (req,res) => {
 
     const updatedSupplier = await supplier.save()
 
-    res.json({ message: `${updatedSupplier.firstName} updated`})
+    res.json({ message: `${updatedSupplier.username} updated`})
 })
 
 // @desc delete a supplier
@@ -152,7 +148,7 @@ const deleteSupplier = asyncHandler (async (req,res) => {
 
     const result = await supplier.deleteOne()
 
-    const reply = `Username ${result.firstName} with ID ${result.id} deleted`
+    const reply = `Username ${result.username} with ID ${result.id} deleted`
 
     res.json(reply)
 })

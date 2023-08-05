@@ -10,6 +10,9 @@ import multer from "multer"
 import { register } from "./controllers/auth.js"
 import supplierRoutes from "./routes/supplierRoutes.js"
 import buyerRoutes from "./routes/buyerRoutes.js"
+const corsOptions = require('./config/corsOptions')
+const { logger } = require ('./middleware/logger')
+const errorHandler = require('./middleware/errorHandler')
 
 
 const __filename= fileURLToPath(import.meta.url)
@@ -17,7 +20,9 @@ const __dirname = path.dirname(__filename)
 
 const app = express()
 
-app.use(cors())
+app.use(logger)
+
+app.use(cors(corsOptions))
 
 app.use(express.json())
 
@@ -33,6 +38,8 @@ app.use(bodyParser.urlencoded( { limit: "30mb", extended: true}))
 
 app.use("/assets", express.static(path.join(__dirname, 'public/assets')))
 
+app.use(errorHandler)
+
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, "public/assets")
@@ -43,6 +50,18 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage })
+
+app.all('*', (req,res) => {
+    res.status(404)
+    if (req.accepts('html')) {
+        res.sendFile(path.join(__dirname, 'views', '404.html'))
+
+    } else if (req.accepts('json')) {
+        res.json({ message: '404 Not Found'})
+    } else {
+        res.type('txt').send('404 Not Found')
+    }
+})
 
 /* Routes with files */
 app.post("/auth/register", upload.single("picture"), register)

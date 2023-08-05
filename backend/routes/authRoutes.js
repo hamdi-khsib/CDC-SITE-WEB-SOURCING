@@ -1,14 +1,15 @@
 import express from "express";
 import authController from "../controllers/authController.js"
+const loginLimiter = require("../middleware/loginLimiter")
 
 const router = express.Router()
 
-router.post("/login", authController.login)
+router.post("/login",loginLimiter, authController.login)
 
 router.route("/refresh")
-    .get()
+    .get(authController.refresh)
 
 router.route("/logout")
-    .post()
+    .post(authController.logout)
     
 export default router

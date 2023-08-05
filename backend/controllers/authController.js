@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import Supplier from "../models/Supplier.js"
+import asyncHandler from "express-async-handler"
 
 /* register supplier */
 
@@ -44,9 +45,11 @@ export const register = async (req, res) => {
     }
 }
 
-/*  logging in */
 
-export const login = async (req, res) => {
+// @desc login
+// @route POST /auth/login
+// @access Public
+export const login = asyncHandler(async (req, res) => {
     try {
         const { email, password } = req.body
         const supplier = await Supplier.findOne({ email: email})
@@ -62,4 +65,26 @@ export const login = async (req, res) => {
         } catch(err) {
         res.status(500).json({ error: err.message})
     }
+})
+
+// @desc refresh
+// @route GET /auth/refresh
+// @access Public
+const refresh = (req, res) => {
+
+}
+
+
+// @desc logout
+// @route POST /auth/logout
+// @access Public
+const logout = (req, res) => {
+
+}
+
+
+module.exports = {
+    login,
+    refresh,
+    logout
 }

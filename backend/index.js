@@ -1,29 +1,25 @@
 import app from "./server.js"
 
-import mongodb from "mongodb"
+import mongoose from "monngoose"
 import dotenv from "dotenv"
 
-
-
-/* import RestaurantsDAO from "./dao/restaurantsDAO.js"
-import ReviewsDAO from "./dao/reviewsDAO.js" */
+const PORT = process.env.PORT || 8000
 
 dotenv.config()
 
-const MongoClient = mongodb.MongoClient
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
 
-const port = process.env.PORT || 8000
+    /* ADD DATA ONE TIME */
+    // User.insertMany(users);
+    // Post.insertMany(posts);
+  })
+  .catch((error) => console.log(`${error} did not connect`));
 
-MongoClient.connect(process.env.MONGO_URI
-    )
-    .catch(err => {
-        console.error(err.stack)
-        process.exit(1)
-    })
-    .then(async client => {
-        /* await RestaurantsDAO.injectDB(client) */
-        /* await ReviewsDAO.injectDB(client) */
-        app.listen(port, () => {
-            console.log(`Listening on port ${port}`)
-        })
-    })
+
+
+

@@ -101,7 +101,7 @@ export const login = asyncHandler(async (req, res) => {
 // @desc refresh
 // @route GET /auth/refresh
 // @access Public
-const refresh = (req, res) => {
+export const refresh = (req, res) => {
     const cookies = req.cookies
 
     if (!cookies?.jwt) return res.status(401).json({ message: 'Unauthorized'})
@@ -139,7 +139,7 @@ const refresh = (req, res) => {
 // @desc logout
 // @route POST /auth/logout
 // @access Public
-const logout = (req, res) => {
+export const logout = (req, res) => {
     const cookies = req.cookies
     if(!cookies?.jwt) return res.sendStatus(204)
     res.clearCookie('jwt', { httpOnly: true, sameSite: 'None'
@@ -147,9 +147,3 @@ const logout = (req, res) => {
     res.json({ message: 'Cookie cleared'})
 }
 
-
-module.exports = {
-    login,
-    refresh,
-    logout
-}

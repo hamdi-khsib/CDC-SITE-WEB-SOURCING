@@ -1,6 +1,6 @@
 import express from "express"
-import buyerController from "../controllers/buyerController.js"
-import { verifyJWT } from "../middleware/verifyJWT.js"
+const buyerController = require("../controllers/buyerController")
+const verifyJWT = require("../middleware/verifyJWT")
 
 const router = express.Router()
 

@@ -5,9 +5,9 @@ import bodyParser from "body-parser"
 import morgan from "morgan"
 import path from "path"
 import { fileURLToPath } from "url"
-import authRoutes from "./routes.auth.js"
+import authRoutes from "./routes/authRoutes.js"
 import multer from "multer"
-import { register } from "./controllers/auth.js"
+import { register } from "./controllers/authController.js"
 import supplierRoutes from "./routes/supplierRoutes.js"
 import buyerRoutes from "./routes/buyerRoutes.js"
 const corsOptions = require('./config/corsOptions')
@@ -51,17 +51,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage })
 
-app.all('*', (req,res) => {
-    res.status(404)
-    if (req.accepts('html')) {
-        res.sendFile(path.join(__dirname, 'views', '404.html'))
 
-    } else if (req.accepts('json')) {
-        res.json({ message: '404 Not Found'})
-    } else {
-        res.type('txt').send('404 Not Found')
-    }
-})
 
 /* Routes with files */
 app.post("/auth/register", upload.single("picture"), register)

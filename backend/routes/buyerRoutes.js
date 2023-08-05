@@ -1,8 +1,10 @@
 import express from "express"
 import buyerController from "../controllers/buyerController.js"
-import { verifyToken } from "../middleware/auth.js"
+import { verifyJWT } from "../middleware/verifyJWT.js"
 
 const router = express.Router()
+
+router.use(verifyJWT)
 
 /* read */
 router.get("/", verifyToken, buyerController.getAllBuyers)

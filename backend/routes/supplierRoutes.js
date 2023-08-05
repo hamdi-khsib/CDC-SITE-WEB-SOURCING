@@ -5,6 +5,7 @@ import { verifyJWT } from "../middleware/verifyJWT.js"
 const router = express.Router()
 
 router.use(verifyJWT)
+
 /* read */
 router.get("/", supplierController.getAllSuppliers)
 

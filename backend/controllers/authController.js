@@ -2,6 +2,7 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import Supplier from "../models/Supplier.js"
 import asyncHandler from "express-async-handler"
+import { response } from "express"
 
 /* register supplier */
 
@@ -50,27 +51,87 @@ export const register = async (req, res) => {
 // @route POST /auth/login
 // @access Public
 export const login = asyncHandler(async (req, res) => {
-    try {
-        const { email, password } = req.body
-        const supplier = await Supplier.findOne({ email: email})
-        if (!supplier) return  res.status(400).json({ message: "Supplier does not exist"})
+    const { username, password } = req.body
 
-        const isMatch = await bcrypt.compare(password, supplier.password)
-        if (!isMatch) return res.status(400).json({ message: "Invalid Credentials"})
-
-        const token = jwt.sign({ id: supplier._id }, process.env.JWT_SECRET)
-        delete supplier.password
-        es.status(400).json({ token, supplier })
-
-        } catch(err) {
-        res.status(500).json({ error: err.message})
+    if (!username || !password) {
+        return res.status(400).jsonn({message: 'All fields are required'})
     }
+
+    const foundSupplier = await Supplier.findOne({ username }).exec()
+
+    if (!foundSupplier) {
+        return res.status(401).json({ message: 'Unauthorized'})
+    }
+
+    const match = await bcrypt.compare(password, foundSupplier.password)
+
+    if (!match) return res.status(401).json({ message: 'Unauthorized'})
+
+    const accessToken = jwt.sign(
+        {
+            "UserInfo": {
+                "username": foundSupplier.username,
+                "userType": foundSupplier.userType
+            }
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '15m'}
+    )
+
+    const refreshToken = jwt.sign(
+        {
+            "username": foundSupplier.username
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: '1d'}
+    )
+
+    // create secure cookie with refresh token
+    res.cookie('jwt', refreshToken, {
+        httpOnly: true, //accessible only by web server
+        secure: true, //https
+        sameSite: 'None', //croos-site cookie
+        maxAge: 7 * 24 * 60 * 60 * 1000 //cookie expiry: set to match
+    })
+
+    // Send accessToken containing username and userType
+    res.json({ accessToken })
 })
 
 // @desc refresh
 // @route GET /auth/refresh
 // @access Public
 const refresh = (req, res) => {
+    const cookies = req.cookies
+
+    if (!cookies?.jwt) return res.status(401).json({ message: 'Unauthorized'})
+
+    const refreshToken = cookies.jwt
+
+    jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET,
+        asyncHandler(async (err, decoded) => {
+            if (err) return res.status(403).json({ message: 'Forbidden' })
+
+            const foundSupplier = await Supplier.findOne({ username: decoded.username }).exec()
+
+            if (!foundSupplier) return res.status(401).json({ message: 'Unauthorized' })
+
+            const accessToken = jwt.sign(
+                {
+                    "UserInfo": {
+                        "username": foundSupplier.username,
+                        "userType": foundSupplier.userType
+                    }
+                },
+                process.env.ACCESS_TOKEN_SECRET,
+                { expiresIn: '15m' }
+            )
+
+            res.json({ accessToken })
+        })
+    )
 
 }
 
@@ -79,7 +140,11 @@ const refresh = (req, res) => {
 // @route POST /auth/logout
 // @access Public
 const logout = (req, res) => {
-
+    const cookies = req.cookies
+    if(!cookies?.jwt) return res.sendStatus(204)
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None'
+    , secure: true})
+    res.json({ message: 'Cookie cleared'})
 }
 
 

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const SupplierSchema = new mongoose.Schema(
     {
@@ -18,10 +18,6 @@ const SupplierSchema = new mongoose.Schema(
             type: String,
             required: true,
             min: 5
-        },
-        picturePath: {
-            type: String,
-            default: ""
         },
         address: {
             type: String,
@@ -54,4 +50,4 @@ const SupplierSchema = new mongoose.Schema(
 const Supplier = mongoose.model("Supplier", SupplierSchema
 )
 
-export default Supplier
+module.exports = Supplier

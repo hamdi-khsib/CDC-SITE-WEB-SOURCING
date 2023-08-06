@@ -1,4 +1,4 @@
-import express from "express"
+const express = require ("express");
 const supplierController = require("../controllers/supplierController")
 const verifyJWT = require("../middleware/verifyJWT")
 
@@ -19,4 +19,4 @@ router.patch("/", supplierController.updateSupplier)
 router.delete("/", supplierController.deleteSupplier)
 
 
-export default router
+module.exports = router

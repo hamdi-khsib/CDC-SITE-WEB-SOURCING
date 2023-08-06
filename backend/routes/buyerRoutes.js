@@ -1,4 +1,4 @@
-import express from "express"
+const express = require ("express");
 const buyerController = require("../controllers/buyerController")
 const verifyJWT = require("../middleware/verifyJWT")
 
@@ -7,7 +7,7 @@ const router = express.Router()
 router.use(verifyJWT)
 
 /* read */
-router.get("/", verifyToken, buyerController.getAllBuyers)
+router.get("/", buyerController.getAllBuyers)
 
 /* create */
 router.post("/", buyerController.createNewBuyer)
@@ -19,4 +19,4 @@ router.patch("/", buyerController.updateBuyer)
 router.delete("/", buyerController.deleteBuyer)
 
 
-export default router
+module.exports = router

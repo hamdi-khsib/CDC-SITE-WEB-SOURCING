@@ -1,4 +1,4 @@
-import Supplier from "../models/Supplier.js";
+const Supplier = require("../models/Supplier");
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
 

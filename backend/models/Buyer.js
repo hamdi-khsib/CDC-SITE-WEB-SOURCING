@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const SupplierSchema = new mongoose.Schema(
     {
@@ -31,6 +31,6 @@ const SupplierSchema = new mongoose.Schema(
     { timestamps: true }
 )
 
-const Supplier = mongoose.model("Buyer", SupplierSchema)
+const Buyer = mongoose.model("Buyer", SupplierSchema)
 
-export default Supplier
+module.exports = Buyer

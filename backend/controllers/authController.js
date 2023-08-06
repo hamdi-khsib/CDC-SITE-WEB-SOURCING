@@ -1,12 +1,12 @@
-import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
-import Supplier from "../models/Supplier.js"
-import asyncHandler from "express-async-handler"
-import { response } from "express"
+const bcrypt = require("bcrypt")
+const jwt =require("jsonwebtoken")
+const Supplier = require("../models/Supplier.js")
+const asyncHandler = require("express-async-handler")
+const { response } = require("express")
 
 /* register supplier */
 
-export const register = async (req, res) => {
+const register = async (req, res) => {
     try {
         const {
             firstName,
@@ -50,7 +50,7 @@ export const register = async (req, res) => {
 // @desc login
 // @route POST /auth/login
 // @access Public
-export const login = asyncHandler(async (req, res) => {
+const login = asyncHandler(async (req, res) => {
     const { username, password } = req.body
 
     if (!username || !password) {
@@ -101,7 +101,7 @@ export const login = asyncHandler(async (req, res) => {
 // @desc refresh
 // @route GET /auth/refresh
 // @access Public
-export const refresh = (req, res) => {
+const refresh = (req, res) => {
     const cookies = req.cookies
 
     if (!cookies?.jwt) return res.status(401).json({ message: 'Unauthorized'})
@@ -139,7 +139,7 @@ export const refresh = (req, res) => {
 // @desc logout
 // @route POST /auth/logout
 // @access Public
-export const logout = (req, res) => {
+const logout = (req, res) => {
     const cookies = req.cookies
     if(!cookies?.jwt) return res.sendStatus(204)
     res.clearCookie('jwt', { httpOnly: true, sameSite: 'None'
@@ -147,3 +147,9 @@ export const logout = (req, res) => {
     res.json({ message: 'Cookie cleared'})
 }
 
+module.exports = {
+    register,
+    login,
+    refresh,
+    logout
+}

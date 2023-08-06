@@ -1,4 +1,4 @@
-import Buyer from "../models/Buyer.js";
+const Buyer = require("../models/Buyer");
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
 

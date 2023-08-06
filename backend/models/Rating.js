@@ -1,5 +1,5 @@
 // ratings.js
-import mongoose from "mongoose"
+const mongoose = require("mongoose");
 
 const ratingSchema = new mongoose.Schema({
   supplierId: {

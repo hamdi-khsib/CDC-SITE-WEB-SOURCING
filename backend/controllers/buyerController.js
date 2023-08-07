@@ -28,7 +28,7 @@ const createNewBuyer = asyncHandler (async (req,res) => {
     } = req.body
     
     // confirm data
-    if (!username || !email || !contact || !Array.isArray(userType) || !userType.length) {
+    if (!username || !email || !password || !contact || !Array.isArray(userType) || !userType.length) {
         return res.status(400).json({ message
             :'All fields are required' })
     }
@@ -47,9 +47,7 @@ const createNewBuyer = asyncHandler (async (req,res) => {
         username,
         email,
         password: hashedPwd,
-        
         contact,
-        
         userType
     }
 
@@ -58,7 +56,7 @@ const createNewBuyer = asyncHandler (async (req,res) => {
     const buyer = await Buyer.create(buyerObject)
 
     if (buyer) {
-        res.status(201).json({ message: `New buyer ${firstName} created`})
+        res.status(201).json({ message: `New buyer ${username} created`})
     } else {
         res.status(400).json({ message: 'Invalid buyer data received'})
     } 

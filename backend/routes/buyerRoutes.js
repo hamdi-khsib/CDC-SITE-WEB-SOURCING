@@ -1,4 +1,4 @@
-const express = require ("express");
+const express = require("express");
 const buyerController = require("../controllers/buyerController")
 const verifyJWT = require("../middleware/verifyJWT")
 

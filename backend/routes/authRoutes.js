@@ -1,10 +1,14 @@
-const express = require ("express");
+const express = require("express");
 const authController = require("../controllers/authController")
 const loginLimiter = require("../middleware/loginLimiter")
 
 const router = express.Router()
 
-router.post("/login",loginLimiter, authController.login)
+router.route("/register")
+    .post( authController.register)
+
+router.route("/login")
+    .post( loginLimiter, authController.login)
 
 router.route("/refresh")
     .get(authController.refresh)

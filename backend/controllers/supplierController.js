@@ -23,7 +23,6 @@ const createNewSupplier = asyncHandler (async (req,res) => {
         username,
         email,
         password,
-        picturePath,
         address,
         contact,
         domain,
@@ -52,7 +51,6 @@ const createNewSupplier = asyncHandler (async (req,res) => {
         username,
         email,
         password: hashedPwd,
-        picturePath,
         address,
         contact,
         domain,
@@ -83,7 +81,6 @@ const updateSupplier = asyncHandler (async (req,res) => {
         username,
         email,
         password,
-        picturePath,
         address,
         contact,
         domain,
@@ -93,7 +90,7 @@ const updateSupplier = asyncHandler (async (req,res) => {
     } = req.body
 
     // confirm data
-    if (!id || !username || !email || !address || !contact || !domain || !products || !prices || !password || !Array.isArray(userType) || !userType.length) {
+    if (!id || !username || !email || !address || !contact || !domain || !products || !prices || !Array.isArray(userType) || !userType.length) {
         return res.status(400).json({ message
             :'All fields are required' })
     }
@@ -153,9 +150,53 @@ const deleteSupplier = asyncHandler (async (req,res) => {
     res.json(reply)
 })
 
+const renderSuppliersByDomain = asyncHandler( async(req, res) => {
+    try {
+      const suppliers = await Supplier.find().sort('domain');
+      const suppliersByDomain = {};
+  
+      suppliers.forEach(supplier => {
+        if (!suppliersByDomain[supplier.domain]) {
+          suppliersByDomain[supplier.domain] = [];
+        }
+        suppliersByDomain[supplier.domain].push(supplier);
+      });
+  
+      res.status(201).json(suppliersByDomain)
+    } catch (error) {
+        console.error(error);
+      res.status(500).json({ error: 'An error occurred while fetching suppliers.' });
+    }
+  })
+
+const filterSuppliers = asyncHandler(async (req, res) => {
+    const filterTerm = req.query.term;
+  
+    if (!filterTerm) {
+      return res.status(400).json({ message: 'Filter term is required.' });
+    }
+  
+    try {
+      const searchResults = await Supplier.find({
+        $or: [
+          { username: { $regex: filterTerm, $options: 'i' } }, 
+          { products: { $regex: filterTerm, $options: 'i' } },
+          { prices: { $regex: filterTerm, $options: 'i' } }, 
+          { address: { $regex: filterTerm, $options: 'i' } } 
+        ],
+      })
+  
+      res.json(searchResults);
+    } catch (error) {
+      res.status(500).json({ error: 'An error occurred while searching for suppliers.' });
+    }
+});
+
 module.exports= {
     getAllSuppliers,
     createNewSupplier,
     updateSupplier,
-    deleteSupplier
+    deleteSupplier,
+    renderSuppliersByDomain,
+    filterSuppliers
 }

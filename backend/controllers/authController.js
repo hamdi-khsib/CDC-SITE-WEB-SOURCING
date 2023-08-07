@@ -9,11 +9,9 @@ const { response } = require("express")
 const register = async (req, res) => {
     try {
         const {
-            firstName,
-            lastName,
+            username,
             email,
             password,
-            picturePath,
             address,
             contact,
             domain,
@@ -26,11 +24,9 @@ const register = async (req, res) => {
         const passwordHash = await bcrypt.hash(password, salt)
 
         const newSupplier = new Supplier({
-            firstName,
-            lastName,
+            username,
             email,
             password: passwordHash,
-            picturePath,
             address,
             contact,
             domain,

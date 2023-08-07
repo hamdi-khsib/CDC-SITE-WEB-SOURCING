@@ -24,8 +24,7 @@ const SupplierSchema = new mongoose.Schema(
             required: true
         },
         userType: [{
-            type: String,
-            default: "Buyer"
+            type: String
         }]
     },
     { timestamps: true }

@@ -1,20 +1,21 @@
-const express = require ("express");
-const cors = require ("cors");
-const helmet = require ("helmet");
-const bodyParser = require ("body-parser");
-const morgan = require ("morgan");
-const path = require ("path");
-const authRoutes = require ("./routes/authRoutes");
-const supplierRoutes = require ("./routes/supplierRoutes");
-const buyerRoutes = require ("./routes/buyerRoutes");
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
+const bodyParser = require("body-parser");
+const morgan = require("morgan");
+const path = require("path");
+const authRoutes = require("./routes/authRoutes");
+const supplierRoutes = require("./routes/supplierRoutes");
+const buyerRoutes = require("./routes/buyerRoutes");
 const multer = require ("multer");
-const { register } = require ("./controllers/authController");
 const corsOptions = require('./config/corsOptions')
-const { logger } = require ('./middleware/logger')
+const { logger } = require('./middleware/logger')
+const { logEvents } = require('./middleware/logger')
 const errorHandler = require('./middleware/errorHandler')
-const mongoose = require ("mongoose");
-const dotenv = require ("dotenv");
-
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+const connectDB = require('./config/dbConn')
+const cookieParser = require('cookie-parser')
 
 
 const PORT = process.env.PORT || 8000
@@ -22,6 +23,8 @@ const PORT = process.env.PORT || 8000
 const app = express()
 
 dotenv.config()
+
+connectDB()
 
 app.use(logger)
 
@@ -39,7 +42,8 @@ app.use(bodyParser.json( { limit: "30mb", extended: true}))
 
 app.use(bodyParser.urlencoded( { limit: "30mb", extended: true}))
 
-app.use(errorHandler)
+app.use(cookieParser())
+
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -52,23 +56,39 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage })
 
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
 
-  })
-  .catch((error) => console.log(`${error} did not connect`));
-
-
-
-
-/* Routes with files */
-app.post("/auth/register", upload.single("picture"), register)
 
 /* Routes */
+app.use('/', express.static(path.join(__dirname, '/public')))
+
+app.use('/', require('./routes/root'))
 app.use("/auth", authRoutes)
-app.use("/suppliers", supplierRoutes)
+app.use('/suppliers', require('./routes/supplierRoutes'))
 app.use("/buyers", buyerRoutes)
+
+app.all('*', (req,res) => {
+    res.status(404)
+    if (req.accepts('html')) {
+        res.sendFile(path.join(__dirname, 'views', '404.html'))
+
+    } else if (req.accepts('json')) {
+        res.json({ message: '404 Not Found'})
+    } else {
+        res.type('txt').send('404 Not Found')
+    }
+})
+
+
+
+app.use(errorHandler)
+
+
+mongoose.connection.once('open', () => {
+    console.log('Connected to MongoDB')
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+})
+
+mongoose.connection.on('error', err => {
+    console.log(err)
+    logEvents(`${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`, 'mongoErrLog.log')
+})

@@ -2,45 +2,61 @@ const bcrypt = require("bcrypt")
 const jwt =require("jsonwebtoken")
 const Supplier = require("../models/Supplier.js")
 const asyncHandler = require("express-async-handler")
-const { response } = require("express")
 
 /* register supplier */
 
-const register = async (req, res) => {
-    try {
-        const {
-            username,
-            email,
-            password,
-            address,
-            contact,
-            domain,
-            products,
-            prices,
-            userType
-        } = req.body
-
-        const salt = await bcrypt.genSalt();
-        const passwordHash = await bcrypt.hash(password, salt)
-
-        const newSupplier = new Supplier({
-            username,
-            email,
-            password: passwordHash,
-            address,
-            contact,
-            domain,
-            products,
-            prices,
-            userType
-        })
-
-        const savedSupplier = await newSupplier.save()
-        res.status(201).json(savedSupplier)
-    } catch (err) {
-        res.status(500).json({ error: err.message })
+const register = asyncHandler (async (req,res) => {
+    const {
+        username,
+        email,
+        password,
+        address,
+        contact,
+        domain,
+        products,
+        prices,
+        userType
+    } = req.body
+    
+    // confirm data
+    if (!username || !email || !address || !contact || !domain || !products || !prices || !password || !Array.isArray(userType) || !userType.length) {
+        return res.status(400).json({ message
+            :'All fields are required' })
     }
-}
+
+    // check for duplicate 
+    const duplicate = await Supplier.findOne({ username }).lean().exec()
+    if (duplicate) {
+        return res.status(400).json({ message:'Duplicate firstname' })
+    }
+
+    //Hash password
+
+    const hashedPwd = await bcrypt.hash(password, 10) // salt rounds
+
+    const supplierObject = {
+        username,
+        email,
+        password: hashedPwd,
+        address,
+        contact,
+        domain,
+        products,
+        prices,
+        userType
+    }
+
+    //Create and store a new user
+
+    const supplier = await Supplier.create(supplierObject)
+
+    if (supplier) {
+        res.status(201).json({ message: `New supplier ${username} created`})
+    } else {
+        res.status(400).json({ message: 'Invalid supplier data received'})
+    } 
+    
+})
 
 
 // @desc login

@@ -12,6 +12,8 @@ const authRoutes = require("./routes/authRoutes");
 const supplierRoutes = require("./routes/supplierRoutes");
 const buyerRoutes = require("./routes/buyerRoutes");
 const ratingRoutes = require("./routes/ratingRoutes");
+const reportRoutes = require("./routes/reportRoutes");
+const transactionRoutes = require("./routes/transactionRoutes");
 const multer = require ("multer");
 const corsOptions = require('./config/corsOptions')
 const { logger } = require('./middleware/logger')
@@ -82,6 +84,8 @@ app.use("/auth", authRoutes)
 app.use('/suppliers', supplierRoutes)
 app.use("/buyers", buyerRoutes)
 app.use("/ratings", ratingRoutes)
+app.use("/reports", reportRoutes)
+app.use("/transactions", transactionRoutes)
 
 app.all('*', (req,res) => {
     res.status(404)

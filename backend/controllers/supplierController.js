@@ -3,6 +3,7 @@ const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
 
 
+
 // @desc Get all suppliers
 // @route GET /suppliers
 // @access Private
@@ -162,7 +163,7 @@ const renderSuppliersByDomain = asyncHandler( async(req, res) => {
         suppliersByDomain[supplier.domain].push(supplier);
       });
   
-      res.status(201).json(suppliersByDomain)
+    res.status(201).json(suppliersByDomain)
     } catch (error) {
         console.error(error);
       res.status(500).json({ error: 'An error occurred while fetching suppliers.' });

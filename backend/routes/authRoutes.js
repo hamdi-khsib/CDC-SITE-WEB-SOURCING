@@ -15,5 +15,7 @@ router.route("/refresh")
 
 router.route("/logout")
     .post(authController.logout)
+
+router.get('/confirm', authController.confirmMail);
     
 module.exports = router

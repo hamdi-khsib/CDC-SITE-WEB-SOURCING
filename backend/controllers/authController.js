@@ -1,9 +1,16 @@
 const bcrypt = require("bcrypt")
+const crypto = require('crypto')
 const jwt =require("jsonwebtoken")
 const Supplier = require("../models/Supplier.js")
 const asyncHandler = require("express-async-handler")
+const transporter = require('../config/mailer')
 
 /* register supplier */
+
+function generateConfirmationToken() {
+    const token = crypto.randomBytes(32).toString('hex');
+    return token;
+}
 
 const register = asyncHandler (async (req,res) => {
     const {
@@ -46,23 +53,73 @@ const register = asyncHandler (async (req,res) => {
         userType
     }
 
-    //Create and store a new user
-
-    const supplier = await Supplier.create(supplierObject)
+const supplier = await Supplier.create(supplierObject)
 
     if (supplier) {
         res.status(201).json({ message: `New supplier ${username} created`})
+        const confirmationToken = generateConfirmationToken();
+        const confirmationLink = `http://localhost:8000/auth/confirm?token=${confirmationToken}`;
+        console.log('Recipient email:', supplier.email);
+        const mailOptions = {
+            from: 'khsib.hamdi@esprit.tn',
+            to: supplier.email,
+            subject: 'Confirm Your Email',
+            html: `<p>Click <a href="${confirmationLink}">here</a> to confirm your email.</p>`,
+        }
+        console.log(mailOptions)
+        try {
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending confirmation email:', error);
+            } else {
+                console.log('Confirmation email sent:', info.response);
+            }
+        });
+        } catch(error) {
+            console.error('Error in sending email:', error);
+    res.status(500).json({ error: 'An error occurred while sending the email.' });
+        }
     } else {
         res.status(400).json({ message: 'Invalid supplier data received'})
     } 
     
 })
 
+const validateConfirmationToken = (receivedToken, generatedToken) => {
+    return receivedToken === generatedToken;
+};
+    
+
+
+const confirmMail = asyncHandler(async(req, res) => {
+
+    const token = req.query.token;
+
+    const isValidToken = validateConfirmationToken(token, generateConfirmationToken());
+
+    if (isValidToken) {
+        if (supplier) {
+            try {
+            
+                res.status(200).json({ message: 'Email confirmed successfully!'})
+            } catch (error) {
+                console.error('Error sending confirmation email:', error)
+                res.status(500).json({ error: 'An error occurred while sending the confirmation email'})
+            }
+        } else {
+            res.status(404).json({ message: 'Supplier not found'})
+        }
+    } else {
+        res.status(400).json({ message: 'Invalid confirmation token'})
+    }
+
+})
+
 
 // @desc login
 // @route POST /auth/login
 // @access Public
-const login = asyncHandler(async (req, res) => {
+const login = asyncHandler(async(req, res) => {
     const { username, password } = req.body
 
     if (!username || !password) {
@@ -163,5 +220,6 @@ module.exports = {
     register,
     login,
     refresh,
-    logout
+    logout,
+    confirmMail
 }

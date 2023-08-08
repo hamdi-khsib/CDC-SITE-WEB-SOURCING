@@ -1,12 +1,12 @@
 const bcrypt = require("bcrypt")
 const crypto = require('crypto')
 const jwt =require("jsonwebtoken")
-const Supplier = require("../models/Supplier.js")
+const Supplier = require("../models/Supplier")
+const Buyer = require("../models/Buyer")
 const asyncHandler = require("express-async-handler")
 const transporter = require('../config/mailer')
 
 /* register supplier */
-
 function generateConfirmationToken() {
     const token = crypto.randomBytes(32).toString('hex');
     return token;
@@ -26,7 +26,7 @@ const register = asyncHandler (async (req,res) => {
     } = req.body
     
     // confirm data
-    if (!username || !email || !address || !contact || !domain || !products || !prices || !password || !Array.isArray(userType) || !userType.length) {
+    if (!username || !email || !address || !contact || !domain || !Array.isArray(products) || !products.length ||  !Array.isArray(prices) || !prices.length || !password || !Array.isArray(userType) || !userType.length) {
         return res.status(400).json({ message
             :'All fields are required' })
     }
@@ -64,7 +64,7 @@ const supplier = await Supplier.create(supplierObject)
             from: 'khsib.hamdi@esprit.tn',
             to: supplier.email,
             subject: 'Confirm Your Email',
-            html: `<p>Click <a href="${confirmationLink}">here</a> to confirm your email.</p>`,
+            html: `<p>weldek ytasti fel application ;)<a href="${confirmationLink}">here</a> </p>`,
         }
         console.log(mailOptions)
         try {
@@ -123,7 +123,7 @@ const login = asyncHandler(async(req, res) => {
     const { username, password } = req.body
 
     if (!username || !password) {
-        return res.status(400).jsonn({message: 'All fields are required'})
+        return res.status(400).json({message: 'All fields are required'})
     }
 
     const foundSupplier = await Supplier.findOne({ username }).exec()
@@ -150,6 +150,58 @@ const login = asyncHandler(async(req, res) => {
     const refreshToken = jwt.sign(
         {
             "username": foundSupplier.username
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: '1d'}
+    )
+
+    // create secure cookie with refresh token
+    res.cookie('jwt', refreshToken, {
+        httpOnly: true, //accessible only by web server
+        secure: true, //https
+        sameSite: 'None', //croos-site cookie
+        maxAge: 7 * 24 * 60 * 60 * 1000 //cookie expiry: set to match
+    })
+
+    // Send accessToken containing username and userType
+    res.json({ accessToken })
+})
+
+// @desc login
+// @route POST /auth/login
+// @access Public
+const loginBuyer = asyncHandler(async(req, res) => {
+    const { username, password } = req.body
+
+    if (!username || !password) {
+        return res.status(400).json({message: 'All fields are required'})
+    }
+
+    const foundBuyer = await Buyer.findOne({ username }).exec()
+
+    if (!foundBuyer) {
+        return res.status(401).json({ message: 'Unauthorized'})
+    }
+
+    const match = await bcrypt.compare(password, foundBuyer.password)
+
+    if (!match) return res.status(401).json({ message: 'Unauthorized'})
+
+    const accessToken = jwt.sign(
+        {
+            "UserInfo": {
+                "username": foundBuyer.username,
+                "userType": foundBuyer.userType,
+                "buyerId": foundBuyer._id.toString()
+            }
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '15m'}
+    )
+
+    const refreshToken = jwt.sign(
+        {
+            "username": foundBuyer.username
         },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: '1d'}
@@ -219,6 +271,7 @@ const logout = (req, res) => {
 module.exports = {
     register,
     login,
+    loginBuyer,
     refresh,
     logout,
     confirmMail

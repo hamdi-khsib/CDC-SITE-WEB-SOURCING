@@ -24,4 +24,7 @@ router.get("/bydomain", supplierController.renderSuppliersByDomain)
 /* filter by different attributes */
 router.get("/filter", supplierController.filterSuppliers)
 
+/* Compare offers */
+router.post("/compare-offers", supplierController.compareOffers)
+
 module.exports = router

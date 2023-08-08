@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt")
 
-const SupplierSchema = new mongoose.Schema(
+const buyerSchema = new mongoose.Schema(
     {
         username: {
             type: String,
@@ -30,6 +31,8 @@ const SupplierSchema = new mongoose.Schema(
     { timestamps: true }
 )
 
-const Buyer = mongoose.model("Buyer", SupplierSchema)
+
+
+const Buyer = mongoose.model("Buyer", buyerSchema)
 
 module.exports = Buyer

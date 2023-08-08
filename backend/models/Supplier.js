@@ -31,14 +31,14 @@ const SupplierSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        products: {
+        products: [{
             type: String,
             required: true
-        },
-        prices: {
+        }],
+        prices: [{
             type: String,
             required: true
-        },
+        }],
         userType: [{
             type: String
         }]

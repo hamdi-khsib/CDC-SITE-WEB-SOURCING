@@ -33,7 +33,7 @@ const createNewSupplier = asyncHandler (async (req,res) => {
     } = req.body
     
     // confirm data
-    if (!username || !email || !address || !contact || !domain || !products || !prices || !password || !Array.isArray(userType) || !userType.length) {
+    if (!username || !email || !address || !contact || !domain || !Array.isArray(products) || !products.length ||  !Array.isArray(prices) || !password || !Array.isArray(userType) || !userType.length) {
         return res.status(400).json({ message
             :'All fields are required' })
     }
@@ -191,6 +191,31 @@ const filterSuppliers = asyncHandler(async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: 'An error occurred while searching for suppliers.' });
     }
+})
+
+const compareOffers = asyncHandler(async (req, res) => {
+    try {
+        const { supplierNames } = req.body;
+
+        const suppliers = await Supplier.find({ username: { $in: supplierNames } });
+
+        const comparisonData = suppliers.map(supplier => {
+            return {
+                supplierName: supplier.name,
+                offers: supplier.products.map((product, index) => {
+                    return {
+                        product,
+                        price: supplier.prices[index]
+                    };
+                })
+            };
+        });
+        console.log(comparisonData)
+        res.json(comparisonData);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'An error occurred while fetching supplier offers' });
+    }
 });
 
 module.exports= {
@@ -199,5 +224,6 @@ module.exports= {
     updateSupplier,
     deleteSupplier,
     renderSuppliersByDomain,
-    filterSuppliers
+    filterSuppliers,
+    compareOffers
 }

@@ -7,6 +7,7 @@ const path = require("path");
 const authRoutes = require("./routes/authRoutes");
 const supplierRoutes = require("./routes/supplierRoutes");
 const buyerRoutes = require("./routes/buyerRoutes");
+const ratingRoutes = require("./routes/ratingRoutes");
 const multer = require ("multer");
 const corsOptions = require('./config/corsOptions')
 const { logger } = require('./middleware/logger')
@@ -63,8 +64,9 @@ app.use('/', express.static(path.join(__dirname, '/public')))
 
 app.use('/', require('./routes/root'))
 app.use("/auth", authRoutes)
-app.use('/suppliers', require('./routes/supplierRoutes'))
+app.use('/suppliers', supplierRoutes)
 app.use("/buyers", buyerRoutes)
+app.use("/ratings", ratingRoutes)
 
 app.all('*', (req,res) => {
     res.status(404)

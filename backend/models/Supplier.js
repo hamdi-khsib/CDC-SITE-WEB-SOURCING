@@ -33,14 +33,15 @@ const SupplierSchema = new mongoose.Schema(
         },
         products: [{
             type: String,
-            required: true
+            
         }],
         prices: [{
             type: String,
-            required: true
+           
         }],
         userType: [{
-            type: String
+            type: String,
+            
         }]
     },
     { timestamps: true }

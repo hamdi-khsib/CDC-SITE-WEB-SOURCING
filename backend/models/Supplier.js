@@ -39,7 +39,7 @@ const SupplierSchema = new mongoose.Schema(
             type: String,
            
         }],
-        userType: [{
+        roles: [{
             type: String,
             
         }]

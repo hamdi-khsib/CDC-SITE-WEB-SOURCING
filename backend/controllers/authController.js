@@ -64,7 +64,7 @@ const supplier = await Supplier.create(supplierObject)
             from: 'khsib.hamdi@esprit.tn',
             to: supplier.email,
             subject: 'Confirm Your Email',
-            html: `<p>weldek ytasti fel application ;)<a href="${confirmationLink}">here</a> </p>`,
+            html: `<p>Pour Confirmer votre mail, veuillez clicker ici</p> <p><a href="${confirmationLink}">here</a></p>`,
         }
         console.log(mailOptions)
         try {

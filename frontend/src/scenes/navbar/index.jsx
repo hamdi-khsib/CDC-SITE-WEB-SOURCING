@@ -21,7 +21,7 @@ import {
   Close,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { setMode, setLogout } from "state";
+import { setMode, logOut } from "../auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "components/FlexBetween";
 
@@ -107,7 +107,7 @@ const Navbar = () => {
               <MenuItem value={"aa"}>
                 <Typography>aa</Typography>
               </MenuItem>
-              <MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
+              <MenuItem onClick={() => dispatch(logOut())}>Log Out</MenuItem>
             </Select>
           </FormControl>
         </FlexBetween>
@@ -182,7 +182,7 @@ const Navbar = () => {
                 <MenuItem value={"aa"}>
                   <Typography>aa</Typography>
                 </MenuItem>
-                <MenuItem onClick={() => dispatch(setLogout())}>
+                <MenuItem onClick={() => dispatch(logOut())}>
                   Log Out
                 </MenuItem>
               </Select>

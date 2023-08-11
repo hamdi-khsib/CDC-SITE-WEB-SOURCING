@@ -24,7 +24,7 @@ const buyerSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        userType: [{
+        roles: [{
             type: String
         }]
     },

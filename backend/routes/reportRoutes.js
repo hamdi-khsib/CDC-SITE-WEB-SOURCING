@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const reportController = require('../controllers/reportController');
-const verifyJWTBuyer = require("../middleware/verifyJWTBuyer")
+const verifyJWT = require("../middleware/verifyJWT")
 
-router.use(verifyJWTBuyer)
+router.use(verifyJWT)
 
 
 router.get('/generate-report', reportController.generateReport);

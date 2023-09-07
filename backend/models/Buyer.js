@@ -25,7 +25,8 @@ const buyerSchema = new mongoose.Schema(
             required: true
         },
         roles: [{
-            type: String
+            type: String,
+            default: ["Buyer"]
         }]
     },
     { timestamps: true }

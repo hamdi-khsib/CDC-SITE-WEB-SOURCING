@@ -13,10 +13,15 @@ router.get('/', supplierController.getAllSuppliers)
 router.post("/", supplierController.createNewSupplier)
 
 /* update */
-router.patch("/", supplierController.updateSupplier)
+router.patch("/:supplierId", supplierController.updateSupplier)
 
 /* delete */
-router.delete("/", supplierController.deleteSupplier)
+router.delete("/:id", supplierController.deleteSupplier)
+
+/* get by id*/
+router.get("/:supplierId", supplierController.getSupplierById)
+
+router.get("/:supplierId/articles", supplierController.getArticlesForSupplier)
 
 /* sort by domain */
 router.get("/bydomain", supplierController.renderSuppliersByDomain)

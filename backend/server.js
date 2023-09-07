@@ -1,8 +1,5 @@
 const express = require("express");
-const session = require('express-session');
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const Buyer = require('./models/Buyer'); 
 const cors = require("cors");
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
@@ -13,6 +10,7 @@ const supplierRoutes = require("./routes/supplierRoutes");
 const buyerRoutes = require("./routes/buyerRoutes");
 const ratingRoutes = require("./routes/ratingRoutes");
 const reportRoutes = require("./routes/reportRoutes");
+const articleRoutes = require("./routes/articleRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
 const multer = require ("multer");
 const corsOptions = require('./config/corsOptions')
@@ -30,15 +28,7 @@ const PORT = process.env.PORT || 8000
 
 const app = express()
 
-app.use(
-    session({
-        secret: require('crypto').randomBytes(64).toString('hex'),
-        saveUninitialized: false,
-    })
-);
 
-app.use(passport.initialize());
-app.use(passport.session());
 
 dotenv.config()
 
@@ -83,6 +73,7 @@ app.use('/', require('./routes/root'))
 app.use("/auth", authRoutes)
 app.use('/suppliers', supplierRoutes)
 app.use("/buyers", buyerRoutes)
+app.use("/articles", articleRoutes)
 app.use("/ratings", ratingRoutes)
 app.use("/reports", reportRoutes)
 app.use("/transactions", transactionRoutes)
@@ -99,42 +90,7 @@ app.all('*', (req,res) => {
     }
 })
 
-passport.use('local',
-    new LocalStrategy(
-        {
-            usernameField: 'username', 
-            passwordField: 'password'
-        },
-        async (username, password, done) => {
-            try {
-                const buyer = await Buyer.findOne({ username });
-                if (!buyer) {
-                    return done(null, false, console.log('Incorrect username' ));
-                }
-                const match = await bcrypt.compare(password, buyer.password)
-                if (!match) {
-                    return done(null, false, console.log('Incorrect password' ));
-                }
-                return done(null, buyer);
-            } catch (error) {
-                return done(error);
-            }
-        }
-    )
-);
 
-passport.serializeUser((buyer, done) => {
-    done(null, buyer.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-    try {
-        const buyer = await Buyer.findById(id);
-        done(null, buyer);
-    } catch (error) {
-        done(error);
-    }
-});
 
 
 

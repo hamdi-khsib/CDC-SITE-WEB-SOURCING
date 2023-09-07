@@ -1,6 +1,5 @@
 const express = require("express");
 const buyerController = require("../controllers/buyerController")
-const verifyJWT = require("../middleware/verifyJWT")
 
 const router = express.Router()
 

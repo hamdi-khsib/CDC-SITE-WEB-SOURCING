@@ -1,6 +1,7 @@
 const Supplier = require("../models/Supplier");
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
+const Article = require("../models/Article");
 
 
 
@@ -15,6 +16,39 @@ const getAllSuppliers = asyncHandler (async (req,res) => {
     res.json(suppliers)
 })
 
+const getArticlesForSupplier  = asyncHandler (async (req,res) => {
+    try {
+        const supplierId = req.params.supplierId;
+        
+        // Fetch articles for the given supplierId
+        const articles = await Article.find({ supplier: supplierId }).exec();
+        
+        res.status(200).json(articles);
+      } catch (error) {
+        console.error("Error fetching articles for supplier:", error);
+        res.status(500).json({ error: "An error occurred while fetching articles" });
+      }
+})
+
+
+const getSupplierById = asyncHandler(async (req, res) => {
+    const supplierId = req.params.id;
+    
+    try {
+      const supplier = await Supplier.findById(supplierId).exec();
+  
+      if (!supplier) {
+        return res.status(400).json({ message: 'Supplier not found' });
+      }
+  
+      res.json(supplier);
+    } catch (error) {
+      // Handle any errors that might occur during the process
+      console.error('Error fetching supplier by ID:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
 
 // @desc create new supplier
 // @route POST /suppliers
@@ -26,14 +60,12 @@ const createNewSupplier = asyncHandler (async (req,res) => {
         password,
         address,
         contact,
-        domain,
-        products,
-        prices,
-        userType
+        domain
+        
     } = req.body
     
     // confirm data
-    if (!username || !email || !address || !contact || !domain || !Array.isArray(products) || !products.length ||  !Array.isArray(prices) || !password || !Array.isArray(userType) || !userType.length) {
+    if (!username || !email || !address || !contact || !domain ) {
         return res.status(400).json({ message
             :'All fields are required' })
     }
@@ -55,9 +87,7 @@ const createNewSupplier = asyncHandler (async (req,res) => {
         address,
         contact,
         domain,
-        products,
-        prices,
-        userType
+        roles: ['Supplier']
     }
 
     //Create and store a new user
@@ -78,25 +108,23 @@ const createNewSupplier = asyncHandler (async (req,res) => {
 // @route PATCH /suppliers
 // @access Private
 const updateSupplier = asyncHandler (async (req,res) => {
-    const {id,
+    const supplierId = req.params.id;
+    const {
         username,
         email,
         password,
         address,
         contact,
-        domain,
-        products,
-        prices,
-        userType
+        domain
     } = req.body
 
     // confirm data
-    if (!id || !username || !email || !address || !contact || !domain || !products || !prices || !Array.isArray(userType) || !userType.length) {
+    if ( !username || !email || !password || !address || !contact || !domain ) {
         return res.status(400).json({ message
             :'All fields are required' })
     }
 
-    const supplier = await Supplier.findById(id).exec()
+    const supplier = await Supplier.findById(supplierId).exec();
 
     if (!supplier) {
         return res.status(400).json({ message: 'supplier not found'})
@@ -114,12 +142,9 @@ const updateSupplier = asyncHandler (async (req,res) => {
     supplier.address = address
     supplier.contact = contact
     supplier.domain = domain
-    supplier.products = products
-    supplier.prices = prices
-    supplier.userType = userType
-
+    
     if (password) {
-        //Hash password
+        
         supplier.password = await bcrypt.hash(password, 10)
     }
 
@@ -132,13 +157,13 @@ const updateSupplier = asyncHandler (async (req,res) => {
 // @route DELETE /suppliers
 // @access Private
 const deleteSupplier = asyncHandler (async (req,res) => {
-    const { id } = req.body
+    const { id } = req.params
 
     if (!id) {
         return res.status(400).json({ message: 'Supplier ID required'})
     }
 
-    const supplier = await Supplier.findById(id).exec()
+    const supplier = await Supplier.findOneAndDelete({_id: id})
 
     if(!supplier) {
         return res.status(400).json({ message: 'Supplier not found'})
@@ -179,10 +204,10 @@ const filterSuppliers = asyncHandler(async (req, res) => {
   
     try {
       const searchResults = await Supplier.find({
-        $or: [
+        $or: [ 
           { username: { $regex: filterTerm, $options: 'i' } }, 
-          { products: { $regex: filterTerm, $options: 'i' } },
-          { prices: { $regex: filterTerm, $options: 'i' } }, 
+          { email: { $regex: filterTerm, $options: 'i' } },
+          { contact: { $regex: filterTerm, $options: 'i' } }, 
           { address: { $regex: filterTerm, $options: 'i' } } 
         ],
       })
@@ -223,7 +248,9 @@ module.exports= {
     createNewSupplier,
     updateSupplier,
     deleteSupplier,
+    getSupplierById,
     renderSuppliersByDomain,
     filterSuppliers,
-    compareOffers
+    compareOffers,
+    getArticlesForSupplier
 }

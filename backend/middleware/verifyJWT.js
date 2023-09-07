@@ -14,11 +14,21 @@ const verifyJWT = (req, res, next) => {
         process.env.ACCESS_TOKEN_SECRET,
         (err, decoded) => {
             if (err) return res.status(403).json({ message: 'Forbidden' })
-            req.supplier = decoded.UserInfo.username
-            req.userType = decoded.UserInfo.userType
+            
+            const roles = decoded.UserInfo.roles;
+            if (roles.includes('Supplier')) {
+                req.supplierId = decoded.UserInfo.supplierId;
+                
+            } else if (roles.includes('Buyer')) {
+                req.buyerId = decoded.UserInfo.buyerId;
+            }
+            req.roles = decoded.UserInfo.roles;
             next()
         }
     )
 }
+
+
+
 
 module.exports = verifyJWT

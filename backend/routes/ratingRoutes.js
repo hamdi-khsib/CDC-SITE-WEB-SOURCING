@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const ratingController = require('../controllers/ratingController');
-const verifyJWTBuyer = require("../middleware/verifyJWTBuyer")
+const verifyJWT = require("../middleware/verifyJWT")
 
-router.use(verifyJWTBuyer)
+router.use(verifyJWT)
 
 router.post('/rate-supplier', ratingController.createRating);
 

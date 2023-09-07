@@ -24,11 +24,11 @@ const createNewBuyer = asyncHandler (async (req,res) => {
         email,
         password,
         contact,
-        userType
+        roles
     } = req.body
     
     // confirm data
-    if (!username || !email || !password || !contact || !Array.isArray(userType) || !userType.length) {
+    if (!username || !email || !password || !contact || !Array.isArray(roles) || !roles.length) {
         return res.status(400).json({ message
             :'All fields are required' })
     }
@@ -43,12 +43,17 @@ const createNewBuyer = asyncHandler (async (req,res) => {
 
     const hashedPwd = await bcrypt.hash(password, 10) // salt rounds
 
-    const buyerObject = {
+    const buyerObject = (!Array.isArray(roles) || !roles.length) ? {
+        username,
+        email,
+        password: hashedPwd,
+        contact
+    } : {
         username,
         email,
         password: hashedPwd,
         contact,
-        userType
+        roles
     }
 
     //Create and store a new user
@@ -74,11 +79,11 @@ const updateBuyer = asyncHandler (async (req,res) => {
         email,
         password,
         contact,
-        userType
+        roles
     } = req.body
 
     // confirm dat
-    if (!id || !username || !email || !contact || !Array.isArray(userType) || !userType.length) {
+    if (!id || !username || !email || !contact || !Array.isArray(roles) || !roles.length) {
         return res.status(400).json({ message
             :'All fields are required' })
     }
@@ -99,7 +104,7 @@ const updateBuyer = asyncHandler (async (req,res) => {
     buyer.username = username
     buyer.email = email
     buyer.contact = contact
-    buyer.userType = userType
+    buyer.roles = roles
 
     if (password) {
         //Hash password
@@ -115,13 +120,13 @@ const updateBuyer = asyncHandler (async (req,res) => {
 // @route DELETE /buyers
 // @access Private
 const deleteBuyer = asyncHandler (async (req,res) => {
-    const { id } = req.body
+    const { id } = req.params
 
     if (!id) {
         return res.status(400).json({ message: 'Buyer ID required'})
     }
 
-    const buyer = await Buyer.findById(id).exec()
+    const buyer = await Buyer.findOneAndDelete({_id: id})
 
     if(!buyer) {
         return res.status(400).json({ message: 'Buyer not found'})

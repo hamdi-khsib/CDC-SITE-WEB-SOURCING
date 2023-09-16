@@ -7,9 +7,9 @@ const createRating = asyncHandler( async(req, res) => {
         return res.status(401).json({ message: 'Unauthorized' });
     }
     
-    const { supplierId, rating, comment } = req.body;
+    const { supplierId, rating } = req.body;
     const buyerId = req.buyerId;
-    console.log(req.buyerId)
+   
 
     
    
@@ -17,8 +17,7 @@ const createRating = asyncHandler( async(req, res) => {
         const newRating = new Rating({
             buyerId,
             supplierId,
-            rating,
-            comment,
+            rating
         });
 
         await newRating.save();

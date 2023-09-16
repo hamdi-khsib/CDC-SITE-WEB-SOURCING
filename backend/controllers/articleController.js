@@ -13,6 +13,17 @@ const getAllarticles = asyncHandler (async (req,res) => {
     res.json(articles)
 })
 
+const getArticleId = asyncHandler(async (req, res) => {
+    const article = await Article.findById(req.params.id)
+ 
+    if (article) {
+      res.json(article)
+    } else {
+      res.status(404)
+      throw new Error('Article not found')
+    }
+  })
+
 
 // @desc create new Article
 // @route POST /articles
@@ -22,11 +33,12 @@ const createNewArticle = asyncHandler (async (req,res) => {
         name,
         description,
         products,
-        prices
+        prices,
+        quantity
     } = req.body
 
 
-    if (!name || !description || !products || !prices ) {
+    if (!name || !description || !products || !prices || !quantity ) {
         return res.status(400).json({ message
             :'All fields are required' })
     }
@@ -38,7 +50,8 @@ const createNewArticle = asyncHandler (async (req,res) => {
             name,
             description,
             products,
-            prices
+            prices,
+            quantity
         });
 
         await newArticle.save();
@@ -63,7 +76,7 @@ const updateArticle = asyncHandler (async (req,res) => {
         description,
         products,
         prices,
-        delai
+        quantity
     } = req.body
 
     
@@ -84,7 +97,7 @@ const updateArticle = asyncHandler (async (req,res) => {
     Article.description = description
     Article.products = products
     Article.prices = prices
-    Article.delai = delai
+    Article.quantity = quantity
 
 
     const updatedArticle = await Article.save()
@@ -115,9 +128,49 @@ const deleteArticle = asyncHandler (async (req,res) => {
     res.json(reply)
 })
 
+
+const createArticleReview = asyncHandler(async (req, res) => {
+    const { rating, comment } = req.body
+  
+    const article = await Article.findById(req.params.id)
+  
+    if (article) {
+      const alreadyReviewed = article.reviews.find(
+        (r) => r.buyer.toString() === req.buyerId.toString()
+      ) 
+  
+      if (alreadyReviewed) {
+        res.status(400)
+        throw new Error('Article already reviewed')
+      }
+      const buyerId = req.buyerId
+      const review = {
+        rating: Number(rating),
+        comment,
+        buyer:buyerId
+      }
+  
+      article.reviews.push(review)
+  
+      article.numReviews = article.reviews.length
+  
+      article.rating =
+        article.reviews.reduce((acc, item) => item.rating + acc, 0) /
+        article.reviews.length
+  
+      await article.save()
+      res.status(201).json({ message: 'Review added' })
+    } else {
+      res.status(404)
+      throw new Error('Article not found')
+    }
+  })
+
 module.exports= {
     getAllarticles,
     createNewArticle,
     updateArticle,
-    deleteArticle
+    deleteArticle,
+    createArticleReview,
+    getArticleId
 }

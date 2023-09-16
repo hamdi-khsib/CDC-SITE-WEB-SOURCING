@@ -32,7 +32,8 @@ const getArticlesForSupplier  = asyncHandler (async (req,res) => {
 
 
 const getSupplierById = asyncHandler(async (req, res) => {
-    const supplierId = req.params.id;
+    const supplierId = req.params.supplierId;
+    
     
     try {
       const supplier = await Supplier.findById(supplierId).exec();
@@ -108,7 +109,8 @@ const createNewSupplier = asyncHandler (async (req,res) => {
 // @route PATCH /suppliers
 // @access Private
 const updateSupplier = asyncHandler (async (req,res) => {
-    const supplierId = req.params.id;
+    const supplierId = req.params.supplierId;
+    console.log('Supplier ID:', supplierId);
     const {
         username,
         email,
@@ -133,7 +135,7 @@ const updateSupplier = asyncHandler (async (req,res) => {
     // check for duplicate 
     const duplicate = await Supplier.findOne({ username }).lean().exec()
     //Allow updates to t
-    if (duplicate && duplicate?._id.toString() !== id) {
+    if (duplicate && duplicate?._id.toString() !== supplierId) {
         return res.status(409).json({ message: 'Duplicate username'})
     }
 

@@ -36,9 +36,6 @@ const SupplierSchema = new mongoose.Schema(
         },
         confirmedEmail: {
             type: String,
-        },
-        profile: {
-            type: String,
         }
          
     },

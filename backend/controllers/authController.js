@@ -48,8 +48,7 @@ const register = asyncHandler (async (req,res) => {
         password,
         address,
         contact,
-        domain,
-        profile
+        domain
     } = req.body
     
     const errors = {};
@@ -68,9 +67,9 @@ const register = asyncHandler (async (req,res) => {
         errors.password = 'Password must be at least 6 characters';
     }
 
-    {/*if (isNaN(contact)) {
+    if (isNaN(contact)) {
         errors.contact = 'Contact must be a valid number';
-    }*/}
+    }
 
     const duplicate = await Supplier.findOne({ username }).lean().exec()
     if (duplicate) {
@@ -108,7 +107,7 @@ const register = asyncHandler (async (req,res) => {
         domain,
         roles: ['Supplier'],
         confirmationCode ,
-        profile: profile || ''
+        
     };
 
     const supplier = await Supplier.create(supplierObject)

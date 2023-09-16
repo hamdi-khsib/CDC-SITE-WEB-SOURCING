@@ -4,7 +4,7 @@ const verifyJWT = require("../middleware/verifyJWT")
 
 const router = express.Router()
 
-router.use(verifyJWT)
+
 
 /* read */
 router.get('/', supplierController.getAllSuppliers)

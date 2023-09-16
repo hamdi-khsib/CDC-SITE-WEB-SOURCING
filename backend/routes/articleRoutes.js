@@ -3,7 +3,7 @@ const articleController = require("../controllers/articleController")
 const verifyJWT = require("../middleware/verifyJWT")
 
 const router = express.Router()
-router.use(verifyJWT)
+
 
 
 /* read */
@@ -17,6 +17,10 @@ router.patch("/", articleController.updateArticle)
 
 /* delete */
 router.delete("/", articleController.deleteArticle)
+
+router.post('/:id/reviews', articleController.createArticleReview)
+
+router.get('/:id', articleController.getArticleId)
 
 
 module.exports = router

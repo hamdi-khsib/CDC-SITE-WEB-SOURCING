@@ -9,8 +9,7 @@ const ratingSchema = new mongoose.Schema({
   },
   buyerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Buyer',
-    required: true
+    ref: 'Buyer'
   },
   rating: {
     type: Number,

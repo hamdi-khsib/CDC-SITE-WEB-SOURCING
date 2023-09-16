@@ -19,7 +19,7 @@ router.route("/refresh")
 router.route("/logout")
     .post(authController.logout)
 
-router.post('/confirm', authController.confirmMail);
+router.get('/confirm/:code', authController.confirmMail);
 
 router.post('/generate-otp', authController.generateOTP);
 
